@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  runner:
+    environment:
+      - MONGOURI=mongodb://username:password@mongo:27017/golangDB?authSource=admin
+    image: cosmtrek/air
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+      - "5000:5000"
+      - "6000:6000"
+    working_dir: /example
+    volumes:
+      - .:/example
+      - golang_cache:/go/pkg/
+    depends_on:
+      - mongo
+    command: go run main.go
+  mongo:
+    image: mongo:3.6.23
+    environment:
+        - MONGO_INITDB_ROOT_USERNAME=root
+        - MONGO_INITDB_ROOT_PASSWORD=rootPassXXX
+    ports:
+      - "27017:27017"
+    volumes:
+      - /docker/mongo/datadir:/data/db
+      - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
+    command: mongod
+volumes:
+  golang_cache:

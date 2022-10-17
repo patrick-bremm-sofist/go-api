@@ -1,0 +1,5 @@
+Comando para rodar local:
+`go run main.go`
+
+Comando para rodar local e atualizando o código em tempo real no docker:
+`docker-compose up -d`

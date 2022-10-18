@@ -1,3 +1,5 @@
+Criar um dotenv e definir a variavel MONGOURI usando o link de conexão como no exemplo do docker-compose
+
 Comando para rodar local:
 `go run main.go`
 

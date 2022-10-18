@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"go-api/configs"
+	"go-api/interfaces"
 	"go-api/models"
 	"go-api/responses"
 	"net/http"
@@ -15,53 +16,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type UserController struct {
+	interfaces.IUserService
+}
+
 var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
 var validate = validator.New()
 
-func CreateUser(c *fiber.Ctx) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	var user models.User
-	defer cancel()
+func (controller *UserController) CreateUser(c *fiber.Ctx) error {
 
-	// Validate the request body
-	if err := c.BodyParser(&user); err != nil {
-		return c.Status(http.StatusBadRequest).JSON(
-			responses.UserResponse{
-				Status:  http.StatusBadRequest,
-				Message: "error",
-				Data:    &fiber.Map{"data": err.Error()}})
-	}
-
-	// Use the validator library to validate required fields
-	if validationErr := validate.Struct(&user); validationErr != nil {
-		return c.Status(http.StatusBadRequest).JSON(
-			responses.UserResponse{
-				Status:  http.StatusBadRequest,
-				Message: "error",
-				Data:    &fiber.Map{"data": validationErr.Error()}})
-	}
-
-	newUser := models.User{
-		Id:       primitive.NewObjectID(),
-		Name:     user.Name,
-		Location: user.Location,
-		Title:    user.Title,
-	}
-
-	result, err := userCollection.InsertOne(ctx, newUser)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(
-			responses.UserResponse{
-				Status:  http.StatusInternalServerError,
-				Message: "error",
-				Data:    &fiber.Map{"data": err.Error()}})
-	}
-
-	return c.Status(http.StatusCreated).JSON(
-		responses.UserResponse{
-			Status:  http.StatusCreated,
-			Message: "success",
-			Data:    &fiber.Map{"data": result}})
+	return controller.CreateAUser(c)
 }
 
 func GetAUser(c *fiber.Ctx) error {
